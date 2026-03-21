@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Manager</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>🎓 Student Manager</h1>
+
+    <!-- Add Form -->
+    <form action="/add" method="POST" class="form">
+        <input type="text" name="name" placeholder="Name" required>
+        <input type="number" name="age" placeholder="Age" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="text" name="department" placeholder="Department" required>
+        <button type="submit">Add Student</button>
+    </form>
+
+    <!-- Search -->
+    <form method="GET">
+        <input type="text" name="search" placeholder="Search by name">
+        <button type="submit">Search</button>
+    </form>
+
+    <!-- Stats -->
+    <div class="stats">
+        <h3>Total Students: {{ total_students }}</h3>
+        <h3>Average Age: {{ avg_age }}</h3>
+    </div>
+
+    <!-- Student Cards -->
+    <div class="cards">
+        {% for student in students %}
+        <div class="card">
+            <h3>{{ student.name }}</h3>
+            <p>Age: {{ student.age }}</p>
+            <p>Email: {{ student.email }}</p>
+            <p>Dept: {{ student.department }}</p>
+
+            <!-- ✅ Move Edit HERE -->
+            <a href="/edit/{{ student.id }}">Edit</a>
+            <a href="/delete/{{ student.id }}" class="delete-btn">Delete</a>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+</body>
+</html>
