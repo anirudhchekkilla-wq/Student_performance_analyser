@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | EduPulse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div class="auth-title">
+                <h2>📝 Create your account</h2>
+                <p class="auth-subtitle">Register as admin or student</p>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for msg in messages %}
+                        <div class="flash-success"><b>{{ msg }}</b></div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="/register">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Role</label>
+                    <select name="role" required>
+                        <option value="">Select Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="student">Student</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary">Register</button>
+            </form>
+
+            <div class="auth-link">
+                <a href="/login">Already have an account? Login</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,19 +1,155 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Edit Student</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Student | EduPulse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        const subjects = {
+            "CSE": {
+                1: ["Maths", "C", "English", "Chemistry"],
+                2: ["DS", "Python", "Physics", "Maths2"],
+                3: ["OOP", "Java", "DBMS", "OS"],
+                4: ["CN", "CPP", "SE", "DM"],
+                5: ["AI", "ML", "DL", "CV"],
+                6: ["NLP", "Big Data", "Cloud", "Cyber Security"],
+                7: ["IoT", "Blockchain", "Data Science", "Ethical Hacking"],
+                8: ["Mobile App Dev", "Web Dev", "Software Testing", "Project Management"]
+            },
+            "IT": {
+                1: ["Maths", "C", "English", "Chemistry"],
+                2: ["DS", "Python", "Physics", "Maths2"],
+                3: ["OOP", "QALR", "UHV", "DE"],
+                4: ["CO", "ITWS", "DBMS", "PP"],
+                5: ["DAA", "CN", "IDS", "DWDM", "IPR", "SE"],
+                6: ["OS", "Big Data", "AIDL", "CSCL", "ML", "WT"],
+                7: ["IoT", "Blockchain", "Data Science", "Ethical Hacking"],
+                8: ["Mobile App Dev", "Web Dev", "Software Testing", "Project Management"]
+            }
+        };
+
+        function subjectKey(sub) {
+            return sub.replaceAll(" ", "_").replaceAll("-", "_").toLowerCase();
+        }
+
+        function loadNewSubjects() {
+            const branch = document.getElementById("branch").value;
+            const sem = document.getElementById("semester").value;
+            const container = document.getElementById("new-subjects-container");
+
+            container.innerHTML = "";
+
+            if (subjects[branch] && subjects[branch][sem]) {
+                subjects[branch][sem].forEach(sub => {
+                    const key = subjectKey(sub);
+
+                    container.innerHTML += `
+                        <div class="subject-row">
+                            <div>
+                                <label class="subject-name">${sub}</label>
+                            </div>
+                            <div>
+                                <label>Internal</label>
+                                <input type="number" name="${key}_internal" min="0" max="40" value="0" required>
+                            </div>
+                            <div>
+                                <label>External</label>
+                                <input type="number" name="${key}_external" min="0" max="60" value="0" required>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+    </script>
 </head>
 <body>
+    <div class="page-container">
+        <div class="top-bar">
+            <div>
+                <h1 class="page-title">✏️ Edit <span class="gradient-text">Student</span></h1>
+                <p class="subtitle">Update student details and marks</p>
+            </div>
+            <a href="/" class="back-link">⬅ Back</a>
+        </div>
 
-<h2>Edit Student</h2>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for msg in messages %}
+                    <div class="flash-error"><b>{{ msg }}</b></div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-<form method="POST">
-    <input type="text" name="name" value="{{ student.name }}">
-    <input type="number" name="age" value="{{ student.age }}">
-    <input type="email" name="email" value="{{ student.email }}">
-    <input type="text" name="department" value="{{ student.department }}">
-    <button type="submit">Update</button>
-</form>
+        <section class="card">
+            <form method="POST" action="/edit/{{ student.id }}">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="name" value="{{ student.name }}" required>
+                </div>
 
+                <div class="form-group">
+                    <label>Roll No</label>
+                    <input type="text" name="roll_no" value="{{ student.roll_no }}" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" value="{{ student.email }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="text" name="phone" value="{{ student.phone }}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Branch</label>
+                        <select name="branch" id="branch" onchange="loadNewSubjects()" required>
+                            <option value="CSE" {% if student.branch == 'CSE' %}selected{% endif %}>CSE</option>
+                            <option value="IT" {% if student.branch == 'IT' %}selected{% endif %}>IT</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Semester</label>
+                        <select name="semester" id="semester" onchange="loadNewSubjects()" required>
+                            {% for sem in range(1, 9) %}
+                                <option value="{{ sem }}" {% if student.semester == sem %}selected{% endif %}>{{ sem }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <h3 class="section-title">Existing Subject Marks</h3>
+
+                {% for mark in marks %}
+                    <div class="marks-block">
+                        <h4>{{ mark.subject }}</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Internal</label>
+                                <input type="number" name="internal_{{ loop.index0 }}" value="{{ mark.internal }}" min="0" max="40" required>
+                            </div>
+                            <div class="form-group">
+                                <label>External</label>
+                                <input type="number" name="external_{{ loop.index0 }}" value="{{ mark.external }}" min="0" max="60" required>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <h3 class="section-title">If branch/semester changes, fill new subject marks below</h3>
+                <div id="new-subjects-container"></div>
+
+                <button type="submit" class="btn-primary">Update</button>
+            </form>
+        </section>
+    </div>
 </body>
 </html>

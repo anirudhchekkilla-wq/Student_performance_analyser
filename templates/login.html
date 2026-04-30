@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | EduPulse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div class="auth-title">
+                <h2>🔐 Login <span class="gradient-text"></span></h2>
+                <p class="auth-subtitle">Access your student performance dashboard</p>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for msg in messages %}
+                        <div class="flash-error"><b>{{ msg }}</b></div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="/login">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required>
+                </div>
+
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+
+            <div class="auth-link">
+                <a href="/register">Create new account</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

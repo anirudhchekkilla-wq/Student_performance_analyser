@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Insights</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        .chart-container {
+            width: 400px;
+            height: 300px;
+            margin: 30px auto;
+            position: relative;
+        }
+        .back-link {
+    color: var(--primary);
+    font-weight: 600;
+
+    position: absolute;
+    top: 20px;
+    right: 30px;
+}
+    </style>
+</head>
+
+<body>
+    <a href="/" class="back-link">⬅ Back</a>
+   {% if session.role == 'admin' %}
+
+<h2>🏆 Highest Performing Branch</h2>
+
+<div style="
+    width: 320px;
+    margin: 20px auto;
+    padding: 15px;
+    border-radius: 12px;
+    background: #ecfdf5;
+    border: 2px solid #22c55e;
+    text-align: center;
+">
+
+    <h3 style="color:#15803d;">
+        {{ top_branch }} (GPA: {{ top_branch_gpa }})
+    </h3>
+
+</div>
+
+{% endif %}
+
+
+<h2>📊 Branch-wise GPA (Bar Chart)</h2>
+<div class="chart-container">
+    <canvas id="barChart"></canvas>
+</div>
+
+{% if session.role == 'admin' %}
+<h2>🥧 Branch Distribution (Pie Chart)</h2>
+<div class="chart-container">
+    <canvas id="pieChart"></canvas>
+</div>
+{% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const branchLabels = {{ branch_labels | tojson | safe }} || [];
+    const branchAvgGpa = {{ branch_avg_gpa | tojson | safe }} || [];
+
+    // BAR CHART (for everyone)
+    if (branchLabels.length > 0) {
+        new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: branchLabels,
+                datasets: [{
+                    label: 'Average GPA',
+                    data: branchAvgGpa,
+                    backgroundColor: '#6366f1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    // ✅ PIE CHART (ONLY ADMIN)
+    {% if session.role == 'admin' %}
+    const pieLabels = {{ pie_labels | tojson | safe }} || [];
+    const pieValues = {{ pie_values | tojson | safe }} || [];
+
+    if (pieLabels.length > 0) {
+        new Chart(document.getElementById('pieChart'), {
+            type: 'pie',
+            data: {
+                labels: pieLabels,
+                datasets: [{
+                    data: pieValues,
+                    backgroundColor: ['#6366f1', '#22c55e']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+    {% endif %}
+
+});
+</script>
+
+</body>
+</html>

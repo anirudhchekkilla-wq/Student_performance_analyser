@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Report | EduPulse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="page-container">
+        <div class="top-bar">
+            <div>
+                <h1 class="page-title">📄 Student <span class="gradient-text">Report</span></h1>
+                <p class="subtitle">Detailed academic performance overview</p>
+            </div>
+            <a href="/" class="back-link">⬅ Back</a>
+        </div>
+
+        <!-- Student Info -->
+        <div class="info-grid">
+            <div class="info-card">
+                <span>Name</span>
+                <strong>{{ student.name }}</strong>
+            </div>
+            <div class="info-card">
+                <span>Roll No</span>
+                <strong>{{ student.roll_no }}</strong>
+            </div>
+            <div class="info-card">
+                <span>Branch</span>
+                <strong>{{ student.branch }}</strong>
+            </div>
+            <div class="info-card">
+                <span>Semester</span>
+                <strong>{{ student.semester }}</strong>
+            </div>
+        </div>
+
+        <!-- Marks Table -->
+        <section class="card table-card">
+            <div class="table-header">
+                <h3>📊 Subject-wise Marks</h3>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Internal</th>
+                            <th>External</th>
+                            <th>Total</th>
+                            <th>Grade</th>
+                            <th>GPA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if subject_data %}
+                            {% for m in subject_data %}
+                            <tr>
+                                <td>{{ m.subject }}</td>
+                                <td>{{ m.internal }}</td>
+                                <td>{{ m.external }}</td>
+                                <td>{{ m.total }}</td>
+                                <td>{{ m.grade }}</td>
+                                <td>{{ m.gpa }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="no-data">No marks available for this student.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Charts + Performance -->
+        <div class="report-grid">
+            <section class="card">
+                <h3>📈 Subject-wise Performance Chart</h3>
+                <div class="chart-box">
+                    <canvas id="studentMarksChart"></canvas>
+                </div>
+            </section>
+
+            <section class="card">
+                <h3>🎯 Overall Performance</h3>
+                <div class="insight-item"><strong>Average Marks:</strong> {{ avg }}</div>
+                <div class="insight-item"><strong>Average GPA:</strong> {{ avg_gpa }}</div>
+                <div class="insight-item"><strong>Overall Grade:</strong> {{ overall_grade }}</div>
+            </section>
+        </div>
+
+        <!-- ✅ TASK SECTION (FIXED) -->
+        <section class="card" style="margin-top:20px;">
+            <h3>📝 Student Tasks</h3>
+
+            {% if tasks %}
+                {% for t in tasks %}
+                    <div style="padding:10px; border-bottom:1px solid #ddd;">
+                        <b>{{ t.title }}</b><br>
+                        <small>📅 {{ t.start_date }} → {{ t.end_date }}</small><br>
+                        <small style="color:{% if t.status=='Completed' %}green{% else %}orange{% endif %}">
+                            {{ t.status }}
+                        </small>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="no-data">No tasks available</p>
+            {% endif %}
+        </section>
+
+    </div>
+
+    <script>
+        const chartLabels = {{ chart_labels | tojson }};
+        const chartValues = {{ chart_values | tojson }};
+
+        new Chart(document.getElementById('studentMarksChart'), {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'Total Marks',
+                    data: chartValues,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
